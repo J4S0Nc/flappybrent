@@ -74,10 +74,9 @@
 		const input = []
 		const music = document.getElementById('music')
 
-		document.addEventListener('keydown', () => input.push(true))
+		document.addEventListener('keyup', () => input.push(true))
 		document.addEventListener('click', () => input.push(true))
-		document.addEventListener("touchstart", () => input.push(true));
-
+		
 		let time = performance.now()
 		requestAnimationFrame(loop)
 
@@ -85,7 +84,7 @@
 			requestAnimationFrame(loop)
 
 			const now = performance.now()
-			while (time + TICK <= now) {
+			while (time + TICK <= now) {				
 				const flapping = input.shift()
 				const finished = game.update(flapping)
 				if (finished) game = new Game()
