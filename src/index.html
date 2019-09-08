@@ -11,6 +11,15 @@
 	<meta name="apple-mobile-web-app-title" content="Flappy Brent">
 	<meta name="msapplication-TileImage" content="assets/brent0.png">
 	<meta name="msapplication-TileColor" content="#96c93e">
+
+	<meta property="og:site_name" content="Flappy Brent" />
+	<meta property="og:title" content="Get the beers! Don't get the Brents!" />
+	<meta property="og:description" content="How many beers can you drink before Brent blocks you?" />
+	<meta property="og:image" content="assets/flappybrent.png">1
+	<meta property="og:url" content="https://flappybrent.z13.web.core.windows.net/">
+	<meta property="og:type" content="website" />
+
+
 	<style>
 		* {
 			box-sizing: border-box;
@@ -76,7 +85,8 @@
 
 		document.addEventListener('keyup', () => input.push(true))
 		document.addEventListener('click', () => input.push(true))
-		
+		document.addEventListener('touchstart', () => input.push(true))
+
 		let time = performance.now()
 		requestAnimationFrame(loop)
 
@@ -84,7 +94,7 @@
 			requestAnimationFrame(loop)
 
 			const now = performance.now()
-			while (time + TICK <= now) {				
+			while (time + TICK <= now) {
 				const flapping = input.shift()
 				const finished = game.update(flapping)
 				if (finished) game = new Game()
