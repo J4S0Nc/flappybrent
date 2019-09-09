@@ -3,6 +3,7 @@ var filesToCache = [
   'index.html',  
   'game.js',
   'view.js',
+  'assets/green0.png',
   'assets/background0.png',
   'assets/beer0.png',
   'assets/beer1.png',
@@ -26,7 +27,7 @@ self.addEventListener('install', function(e) {
 });
 
 /* Serve cached content when offline */
-self.addEventListener('fetch', function(e) {
+self.addEventListener('fetch', function(e) {  
   e.respondWith(
     caches.match(e.request).then(function(response) {
       return response || fetch(e.request);

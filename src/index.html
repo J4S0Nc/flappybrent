@@ -86,9 +86,11 @@
 		const music = document.getElementById('music')
 
 		document.addEventListener('keyup', () => input.push(true))
-		document.addEventListener('click', () => input.push(true))
-		document.addEventListener('touchstart', () => input.push(true))
-
+		if ('ontouchstart' in window) {
+			document.addEventListener('touchstart', () => input.push(true))
+		} else {
+			document.addEventListener('click', () => input.push(true))
+		}
 		let time = performance.now()
 		requestAnimationFrame(loop)
 

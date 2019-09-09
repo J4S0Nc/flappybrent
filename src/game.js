@@ -17,7 +17,7 @@ const CEILING = 55
 const FLOOR = 1500
 
 const DEATH_DELAY = 2000
-const COIN_POINTS = 1
+const BEER_POINTS = 1
 
 class Entity {
     constructor(x, y, size) {
@@ -58,13 +58,13 @@ class Flappy extends Entity {
     }
 }
 
-class Spike extends Entity {
+class Brent extends Entity {
     constructor(x, y) {
         super(x, y, 50)
     }
 }
 
-class Coin extends Entity {
+class Beer extends Entity {
     constructor(x, y) {
         super(x, y, 75)
         this.collected = false
@@ -77,25 +77,34 @@ class Coin extends Entity {
 
 export default class Game {
     constructor() {
+        this.highScore = localStorage.highScore || 0
         this.flappy = new Flappy(START_X, START_Y)
-        this.spikes = []
-        this.coins = []
+        this.brents = []
+        this.beers = []
+        //this.grid = []
         this.started = false
         BRENT_DENSITY = 0
         for (let c = 0; c < GRID_COLUMNS; c++) {
+            //this.grid[c] = []
             for (let r = 0; r < GRID_ROWS; r++) {
+                //let gitem = ' '
                 const x = GRID_LEFT + c * GRID_SIZE
                 const y = GRID_TOP + r * GRID_SIZE
-                if (c > 20 && Math.random() < BRENT_DENSITY) {
-                    this.spikes.push(new Spike(x, y))
+                const b = BRENT_DENSITY + (r * .001)
+                if (c + 1 == GRID_COLUMNS || c > 10 && Math.random() < b) {
+                    this.brents.push(new Brent(x, y))
+                    //gitem = 'X'
                 }
                 else if (Math.random() < GRID_DENSITY) {
-                    this.coins.push(new Coin(x, y))
+                    this.beers.push(new Beer(x, y))
+                    //gitem = 'O'
                 }
+                BRENT_DENSITY += .0001
+                //this.grid[c][r] = gitem;
             }
-            if (c > 20)
-                BRENT_DENSITY += .002
         }
+
+        //console.log(this.grid)
     }
     update(flapping) {
         if (!this.started) {
@@ -106,20 +115,30 @@ export default class Game {
         this.flappy.update(flapping)
 
         if (this.flappy.death === 0) {
-            this.spikes.forEach(s => {
+            this.brents.forEach(s => {
                 if (s.hits(this.flappy)) this.flappy.die()
             })
-            this.coins.forEach(c => {
+            this.beers.forEach(c => {
                 if (c.hits(this.flappy)) c.collect()
             })
+        } else {
+            this.isHighScore();
         }
 
         const finished = this.flappy.death > 0 && performance.now() > this.flappy.death + DEATH_DELAY
         return finished
     }
     score() {
-        return this.coins.reduce((sum, c) => {
-            return c.collected ? sum + COIN_POINTS : sum
+        return this.beers.reduce((sum, c) => {
+            return c.collected ? sum + BEER_POINTS : sum
         }, 0)
+    }
+    isHighScore() {
+        const score = this.score()
+        if (score > this.highScore) {
+            this.highScore = score
+            localStorage.highScore = score
+        }
+        return score >= this.highScore
     }
 }

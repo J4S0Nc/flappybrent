@@ -2,7 +2,7 @@ const FLAPPY_LEFT = 250
 
 let SCROLL_SPEED = 0.33
 const WIDTH = 1920
-const SHAKE = 15
+const SHAKE = 20
 const SHAKE_TIME = 500
 
 function Sprite(path, frames = 1) {
@@ -18,17 +18,17 @@ export default class View {
     constructor() {
         this.bg = Sprite('assets/green')
         this.flappy = Sprite('assets/EddieFlap', 4)
-        this.spike = Sprite('assets/brent')
-        this.coin = Sprite('assets/beer', 3)
+        this.brent = Sprite('assets/brent')
+        this.beer = Sprite('assets/beer', 3)
         this.empty = Sprite('assets/empty')
     }
     render(game, ctx) {
         const flappyFrame = Math.floor(performance.now() / 150) % this.flappy.length
         const flappy = this.flappy[flappyFrame]
-        const spike = this.spike[0]
+        const brent = this.brent[0]
         const empty = this.empty[0]
-        const coinFrame = Math.floor(performance.now() / 200) % this.coin.length
-        const coin = this.coin[coinFrame]
+        const beerFrame = Math.floor(performance.now() / 200) % this.beer.length
+        const beer = this.beer[beerFrame]
         const score = game.score()
         const scroll = (game.flappy.x * SCROLL_SPEED) % WIDTH
         const justDied = game.flappy.death > 0 && performance.now() < game.flappy.death + SHAKE_TIME
@@ -41,34 +41,42 @@ export default class View {
         ctx.save()
         ctx.translate(FLAPPY_LEFT - game.flappy.x, 0)
         ctx.drawImage(flappy, game.flappy.x - flappy.width * 0.6, game.flappy.y - flappy.height * 0.5)
-        game.spikes.forEach(s => {
+        game.brents.forEach(s => {
             if (s.x < game.flappy.x - 300 || s.x > game.flappy.x + 2000) return
-            ctx.drawImage(spike, s.x - spike.width * 0.5, s.y - spike.height * 0.55)
+            ctx.drawImage(brent, s.x - brent.width * 0.5, s.y - brent.height * 0.55)
         })
-        game.coins.forEach(c => {
+        game.beers.forEach(c => {
             if (c.collected) {
-                ctx.drawImage(empty, c.x - coin.width * 0.5, c.y - coin.height * 0.5)
+                ctx.drawImage(empty, c.x - beer.width * 0.5, c.y - beer.height * 0.5)
                 return;
             }
             if (c.x < game.flappy.x - 300 || c.y > game.flappy.x + 2000) return
-            ctx.drawImage(coin, c.x - coin.width * 0.5, c.y - coin.height * 0.5)
+            ctx.drawImage(beer, c.x - beer.width * 0.5, c.y - beer.height * 0.5)
         })
         ctx.restore()
         ctx.fillStyle = '#f99'
         ctx.font = '92px bold verdana'
         ctx.textBaseline = 'top'
-
+        ctx.align = 'left'
         if (!game.started) {
             ctx.font = '120px bold verdana'
             ctx.fillText('Tap to Flap!', 10, 10);
+
         } else {
             ctx.font = '92px bold verdana'
             ctx.fillText(`Beers: ${score}`, 10, 10)
         }
+
+
+
         if (justDied) {
             ctx.font = '420px bold verdana'
-            ctx.fillText('Breeeeent!', 30, 250);
+            ctx.fillText('Breeeeent!', 30, 250);            
         }
+        ctx.font = '92px bold verdana'
+        ctx.align = 'right'
+        ctx.fillText(`High Score: ${game.highScore}`, 1300, 10)
+
         ctx.restore()
     }
 }
