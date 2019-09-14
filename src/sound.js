@@ -45,9 +45,9 @@ export default class Sound {
         localStorage.musicTime = this.music.currentTime
     }
     onMusicEnded() {
-        localStorage.musicTrack = (localStorage.musicTrack % TOTAL_TRACKS)
+        localStorage.musicTrack = (localStorage.musicTrack + 1) % TOTAL_TRACKS
         localStorage.musicTime = 0
-        console.log(`Playing track: ${localStorage.musicTrack + 1}`);
+        console.log(`Playing track: ${localStorage.musicTrack}`);
         this.loadMusic()
         this.music.play()
     }
