@@ -53,7 +53,7 @@ class Flappy extends Entity {
         if (this.y < CEILING) this.y = CEILING
         if (this.y > FLOOR) this.die()
     }
-    die() {
+    die() {        
         this.death = performance.now()
     }
 }
@@ -69,7 +69,7 @@ class Beer extends Entity {
         super(x, y, 75)
         this.collected = false
     }
-    collect() {
+    collect() {        
         this.collected = true
         FLY_SPEED += .001
     }
@@ -106,7 +106,7 @@ export default class Game {
 
         //console.log(this.grid)
     }
-    update(flapping) {
+    update(flapping, sounds) {
         if (!this.started) {
             if (!flapping) return
             this.started = true
@@ -116,10 +116,16 @@ export default class Game {
 
         if (this.flappy.death === 0) {
             this.brents.forEach(s => {
-                if (s.hits(this.flappy)) this.flappy.die()
+                if (s.hits(this.flappy)) {
+                    this.flappy.die()
+                    sounds.playEffect('die');
+                }
             })
             this.beers.forEach(c => {
-                if (c.hits(this.flappy)) c.collect()
+                if (c.hits(this.flappy) && !c.collected) {
+                    c.collect()
+                    sounds.playEffect('drink');
+                }
             })
         } else {
             this.isHighScore();

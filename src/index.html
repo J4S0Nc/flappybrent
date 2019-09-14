@@ -60,7 +60,6 @@
 		<noscript><strong>We're sorry but the web doesn't work properly without JavaScript enabled. Enable it to stop
 				being an idiot.</strong></noscript>
 		<canvas id='viewport' width='1920' height='1080'></canvas>
-		<audio id='music' src='assets/music.mp3' />
 
 	</div>
 	<script>
@@ -75,6 +74,7 @@
 
 		import Game from './game.js'
 		import View from './view.js'
+		import Sound from './sound.js'
 
 		const TICK = 1000 / 240 // 240 updates / second
 
@@ -83,7 +83,7 @@
 		const canvas = document.getElementById('viewport')
 		const ctx = canvas.getContext('2d', { alpha: false })
 		const input = []
-		const music = document.getElementById('music')
+		const sounds = new Sound()
 
 		document.addEventListener('keyup', () => input.push(true))
 		if ('ontouchstart' in window) {
@@ -100,7 +100,7 @@
 			const now = performance.now()
 			while (time + TICK <= now) {
 				const flapping = input.shift()
-				const finished = game.update(flapping)
+				const finished = game.update(flapping, sounds)
 				if (finished) game = new Game()
 				time += TICK
 			}
@@ -108,13 +108,11 @@
 			view.render(game, ctx)
 
 			if (game.started && game.flappy.death === 0) {
-				music.play()
+				sounds.playMusic()
 			} else {
-				music.pause()
-				music.currentTime = 0.5
+				sounds.pauseMusic()
 			}
 		}
-
 		function fullscreen() {
 			if (canvas.webkitRequestFullScreen) {
 				canvas.webkitRequestFullScreen()

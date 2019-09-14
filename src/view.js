@@ -67,11 +67,9 @@ export default class View {
             ctx.fillText(`Beers: ${score}`, 10, 10)
         }
 
-
-
         if (justDied) {
             ctx.font = '420px bold verdana'
-            ctx.fillText('Breeeeent!', 30, 250);            
+            ctx.fillText('Breeeeent!', 30, 250);
         }
         ctx.font = '92px bold verdana'
         ctx.align = 'right'
