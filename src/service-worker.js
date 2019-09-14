@@ -1,8 +1,10 @@
-var cacheName = 'flappy-brent-pwa';
+var cacheName = 'flappy-brent';
 var filesToCache = [
-  'index.html',  
+  'index.html',
   'game.js',
   'view.js',
+  'sound.js',
+  'stats.js',
   'assets/green0.png',
   'assets/background0.png',
   'assets/beer0.png',
@@ -24,7 +26,7 @@ var filesToCache = [
   'assets/music/music7.mp3',
   'assets/music/music8.mp3',
   'assets/music/music9.mp3',
-  'assets/music/music10.mp3',  
+  'assets/music/music10.mp3',
   'assets/sounds/die0.mp3',
   'assets/sounds/die1.mp3',
   'assets/sounds/die2.mp3',
@@ -47,23 +49,39 @@ var filesToCache = [
   'assets/sounds/drink5.mp3',
   'assets/sounds/drink6.mp3',
   'assets/sounds/drink7.mp3',
-  
 ];
 
 /* Start the service worker and cache all of the app's content */
-self.addEventListener('install', function(e) {
+self.addEventListener('install', function (e) {
   e.waitUntil(
-    caches.open(cacheName).then(function(cache) {
+    caches.open(cacheName).then(function (cache) {
       return cache.addAll(filesToCache);
     })
   );
 });
 
 /* Serve cached content when offline */
-self.addEventListener('fetch', function(e) {  
+self.addEventListener('fetch', function (e) {
   e.respondWith(
-    caches.match(e.request).then(function(response) {
+    caches.match(e.request).then(function (response) {
       return response || fetch(e.request);
     })
   );
+});
+
+self.addEventListener('activate', function(event) {
+  event.waitUntil(
+    // Get all the cache names
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        // Get all the items that are stored under a different cache name than the current one
+        cacheNames.filter(function(oldCacheName) {
+          return cacheName != oldCacheName;
+        }).map(function(name) {
+          // Delete the items
+          return caches.delete(name);
+        })
+      ); // end Promise.all()
+    }) // end caches.keys()
+  ); // end event.waitUntil()
 });

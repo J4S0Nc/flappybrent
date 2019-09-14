@@ -51,8 +51,7 @@ export default class Stats {
     }
     saveLocalStats() {
         const json = JSON.stringify(this)
-        const data = btoa(json)
-        console.log(json)
+        const data = btoa(json)        
         localStorage.stats = data
     }
 }
