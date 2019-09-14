@@ -74,7 +74,6 @@
 
 		import Game from './game.js'
 		import View from './view.js'
-		import Sound from './sound.js'
 
 		const TICK = 1000 / 240 // 240 updates / second
 
@@ -83,8 +82,7 @@
 		const canvas = document.getElementById('viewport')
 		const ctx = canvas.getContext('2d', { alpha: false })
 		const input = []
-		const sounds = new Sound()
-
+		
 		document.addEventListener('keyup', () => input.push(true))
 		if ('ontouchstart' in window) {
 			document.addEventListener('touchstart', () => input.push(true))
@@ -100,18 +98,13 @@
 			const now = performance.now()
 			while (time + TICK <= now) {
 				const flapping = input.shift()
-				const finished = game.update(flapping, sounds)
-				if (finished) game = new Game()
+				const finished = game.update(flapping)
+				if (finished && flapping && game.gameOver) game = new Game() //start new game
 				time += TICK
 			}
 
 			view.render(game, ctx)
 
-			if (game.started && game.flappy.death === 0) {
-				sounds.playMusic()
-			} else {
-				sounds.pauseMusic()
-			}
 		}
 		function fullscreen() {
 			if (canvas.webkitRequestFullScreen) {

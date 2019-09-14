@@ -39,6 +39,7 @@ class Flappy extends Entity {
         GRAVITY = 0.1
         FLAP_POWER = 10
         this.death = 0
+        this.deathBy = ''
         this.prevY = this.y
     }
     update(flapping) {
@@ -51,10 +52,11 @@ class Flappy extends Entity {
 
         if (flapping) this.y -= FLAP_POWER
         if (this.y < CEILING) this.y = CEILING
-        if (this.y > FLOOR) this.die()
+        if (this.y > FLOOR) this.die('Falling')
     }
-    die() {        
+    die(by) {
         this.death = performance.now()
+        this.deathBy = by
     }
 }
 
@@ -69,20 +71,29 @@ class Beer extends Entity {
         super(x, y, 75)
         this.collected = false
     }
-    collect() {        
+    collect() {
         this.collected = true
         FLY_SPEED += .001
     }
 }
 
+import Sound from './sound.js'
+import Stats from './stats.js'
 export default class Game {
     constructor() {
-        this.highScore = localStorage.highScore || 0
+        this.startTime = 0
+        this.flaps = 0
         this.flappy = new Flappy(START_X, START_Y)
+        this.sounds = new Sound()
+		this.stats = new Stats()
         this.brents = []
         this.beers = []
-        //this.grid = []
         this.started = false
+        this.gameOver = true
+        this._buildGrid()
+    }
+    _buildGrid() {
+        //this.grid = []
         BRENT_DENSITY = 0
         for (let c = 0; c < GRID_COLUMNS; c++) {
             //this.grid[c] = []
@@ -103,48 +114,49 @@ export default class Game {
                 //this.grid[c][r] = gitem;
             }
         }
-
         //console.log(this.grid)
     }
-    update(flapping, sounds) {
+
+    update(flapping) {
         if (!this.started) {
             if (!flapping) return
             this.started = true
+            this.gameOver = false
+            this.startTime = performance.now()
+            this.flaps = 0
+            this.sounds.playMusic()
         }
 
         this.flappy.update(flapping)
+        if (flapping) this.flaps++
 
         if (this.flappy.death === 0) {
             this.brents.forEach(s => {
                 if (s.hits(this.flappy)) {
-                    this.flappy.die()
-                    sounds.playEffect('die');
+                    this.flappy.die('Brent')
+                    this.sounds.playEffect('die');
                 }
             })
             this.beers.forEach(c => {
                 if (c.hits(this.flappy) && !c.collected) {
                     c.collect()
-                    sounds.playEffect('drink');
+                    this.sounds.playEffect('drink');
                 }
             })
-        } else {
-            this.isHighScore();
+        } else if (!this.gameOver) {
+            this.gameOver = true
+            const time = Math.round((this.flappy.death - this.startTime) / 1000) //ms to sec 
+            this.stats.recordGameOver(this.flappy.deathBy, this.score(), this.flaps, time)
+            this.sounds.pauseMusic()            
         }
 
         const finished = this.flappy.death > 0 && performance.now() > this.flappy.death + DEATH_DELAY
         return finished
     }
+
     score() {
         return this.beers.reduce((sum, c) => {
             return c.collected ? sum + BEER_POINTS : sum
         }, 0)
-    }
-    isHighScore() {
-        const score = this.score()
-        if (score > this.highScore) {
-            this.highScore = score
-            localStorage.highScore = score
-        }
-        return score >= this.highScore
     }
 }

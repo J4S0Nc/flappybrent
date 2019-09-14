@@ -35,7 +35,7 @@ export default class Sound {
         localStorage.musicTrack = localStorage.musicTrack || 0
         this.music.src = `assets/music/music${localStorage.musicTrack}.mp3`
         this.music.load()
-        this.music.currentTime = localStorage.musicTime || 0
+        this.music.currentTime = parseFloat(localStorage.musicTime || 0)
     }
     playMusic() {
         this.music.play()
@@ -45,10 +45,11 @@ export default class Sound {
         localStorage.musicTime = this.music.currentTime
     }
     onMusicEnded() {
-        localStorage.musicTrack = (localStorage.musicTrack + 1) % TOTAL_TRACKS
+        localStorage.musicTrack = (parseInt(localStorage.musicTrack || 0) + 1) % TOTAL_TRACKS
+        localStorage.musicTracksPlayed = parseInt(localStorage.musicTracksPlayed || 0) + 1
         localStorage.musicTime = 0
         console.log(`Playing track: ${localStorage.musicTrack}`);
         this.loadMusic()
-        this.music.play()
+        this.playMusic()
     }
 }
