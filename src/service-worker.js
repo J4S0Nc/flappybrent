@@ -1,4 +1,4 @@
-var cacheName = 'flappy-brent';
+var cacheName = 'flappy-brent-v2';
 var filesToCache = [
   'index.html',
   'game.js',
@@ -53,32 +53,37 @@ var filesToCache = [
 
 /* Start the service worker and cache all of the app's content */
 self.addEventListener('install', function (e) {
+  console.log(`SW Install`)
   e.waitUntil(
     caches.open(cacheName).then(function (cache) {
+      console.log(`SW Adding Files to Cache`)
       return cache.addAll(filesToCache);
+
     })
   );
 });
 
 /* Serve cached content when offline */
-self.addEventListener('fetch', function (e) {
+self.addEventListener('fetch', function (e) {  
   e.respondWith(
-    caches.match(e.request).then(function (response) {
-      return response || fetch(e.request);
+    caches.match(e.request).then(function (match) {      
+      return match || fetch(e.request);
     })
   );
 });
 
-self.addEventListener('activate', function(event) {
+self.addEventListener('activate', function (event) {
+  console.log(`SW Activated`)
   event.waitUntil(
     // Get all the cache names
-    caches.keys().then(function(cacheNames) {
+    caches.keys().then(function (cacheNames) {
       return Promise.all(
         // Get all the items that are stored under a different cache name than the current one
-        cacheNames.filter(function(oldCacheName) {
+        cacheNames.filter(function (oldCacheName) {
           return cacheName != oldCacheName;
-        }).map(function(name) {
+        }).map(function (name) {
           // Delete the items
+          console.log(`SW cleaning up ${name}`)
           return caches.delete(name);
         })
       ); // end Promise.all()
