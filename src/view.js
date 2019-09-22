@@ -23,6 +23,7 @@ export default class View {
         this.empty = Sprite('assets/empty')
     }
     render(game, ctx) {
+        
         const flappyFrame = Math.floor(performance.now() / 150) % this.flappy.length
         const flappy = this.flappy[flappyFrame]
         const brent = this.brent[0]
@@ -77,6 +78,10 @@ export default class View {
             ctx.fillText('Breeeeent!', 30, 250);
         }
 
+        if (game.paused) {            
+            ctx.font = '420px bold verdana'
+            ctx.fillText('Paused!', 300, 350);
+        }
         //game over
         if (!justDied && game.started && game.gameOver) {
             this.drawStats(ctx, game)

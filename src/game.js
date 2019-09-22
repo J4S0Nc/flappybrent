@@ -85,10 +85,11 @@ export default class Game {
         this.flaps = 0
         this.flappy = new Flappy(START_X, START_Y)
         this.sounds = new Sound()
-		this.stats = new Stats()
+        this.stats = new Stats()
         this.brents = []
         this.beers = []
         this.started = false
+        this.paused = false
         this.gameOver = true
         this._buildGrid()
     }
@@ -118,15 +119,19 @@ export default class Game {
     }
 
     update(flapping) {
+        if (this.paused) {
+            this.sounds.pauseMusic()
+            return
+        }
+        
         if (!this.started) {
             if (!flapping) return
             this.started = true
             this.gameOver = false
             this.startTime = performance.now()
-            this.flaps = 0
-            this.sounds.playMusic()
+            this.flaps = 0            
         }
-
+        this.sounds.playMusic()
         this.flappy.update(flapping)
         if (flapping) this.flaps++
 
@@ -147,7 +152,7 @@ export default class Game {
             this.gameOver = true
             const time = Math.round((this.flappy.death - this.startTime) / 1000) //ms to sec 
             this.stats.recordGameOver(this.flappy.deathBy, this.score(), this.flaps, time)
-            this.sounds.pauseMusic()            
+            this.sounds.pauseMusic()
         }
 
         const finished = this.flappy.death > 0 && performance.now() > this.flappy.death + DEATH_DELAY
