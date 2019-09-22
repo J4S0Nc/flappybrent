@@ -31,9 +31,8 @@ export default class WebServices {
             const json = await response.json()            
             return json
         } catch (error) {
-            alert(error)
-            console.error(error)
-            console.error('Erroring sending your score')
+            alert("Erroring sending your score.. Did Brent build the backend?")
+            console.error(error)            
         }
 
     }

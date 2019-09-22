@@ -52,11 +52,29 @@
 			margin: auto;
 			background: #000;
 		}
+
+		#loading {
+			position: absolute;
+			display: block;
+			height: 300px;
+			width: 300px;
+			left: 50%;
+			top: 50%;
+			margin-top: -150px;
+			margin-left: -150px;
+			color: white;
+			text-align: center;
+		}
 	</style>
 </head>
 
 <body>
-	<div id='container'>
+	<div id="loading">
+		<h1>Loading...</h1>
+		<br><br>
+		<img src="assets/brent0.png" />
+	</div>
+	<div id="container" style="display: none">
 		<noscript><strong>We're sorry but the web doesn't work properly without JavaScript enabled. Enable it to stop
 				being an idiot.</strong></noscript>
 		<canvas id='viewport' width='1920' height='1080'></canvas>
@@ -69,6 +87,38 @@
 					console.log('Service Worker Registered');
 				});
 		}
+		function loadAssets() {
+			loadImg('assets/background0.png')
+			loadImg('assets/brent0.png')
+			loadImg('assets/empty0.png')
+			loadImg('assets/green0.png')
+			let i = 0
+			for (i = 0; i < 3; i++) { loadImg(`assets/beer${i}.png`) }
+			for (i = 0; i < 4; i++) { loadImg(`assets/EddieFlap${i}.png`) }
+			for (i = 0; i < 3; i++) { loadImg(`assets/beer${i}.png`) }
+
+		}
+		function loadImg(a) {
+			totalImgs++
+			const im = new Image()
+			im.src = a
+			im.onload = imagesLoaded
+		}
+		let totalImgs = 0
+		let loadedImgs = 0
+		function imagesLoaded() {
+			loadedImgs++;
+			if (loadedImgs === totalImgs) {
+				console.log('All images loaded!');
+				const container = document.getElementById('container')
+				const loading = document.getElementById('loading')
+				loading.style.display = 'none';
+				container.style.display = 'block';
+			}
+		}
+
+		loadAssets()
+
 	</script>
 	<script type='module'>
 
@@ -82,13 +132,14 @@
 		const canvas = document.getElementById('viewport')
 		const ctx = canvas.getContext('2d', { alpha: false })
 		const input = []
-		
+
 		document.addEventListener('keyup', () => input.push(true))
 		if ('ontouchstart' in window) {
 			document.addEventListener('touchstart', () => input.push(true))
 		} else {
 			document.addEventListener('click', () => input.push(true))
 		}
+
 		let time = performance.now()
 		requestAnimationFrame(loop)
 
@@ -114,6 +165,7 @@
 				canvas.mozRequestFullScreen()
 			}
 		}
+
 	</script>
 </body>
 

@@ -1,4 +1,4 @@
-var cacheName = 'flappy-brent-v2';
+var cacheName = 'flappy-brent-v3';
 var filesToCache = [
   'index.html',
   'game.js',
