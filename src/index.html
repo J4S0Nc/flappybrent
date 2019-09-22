@@ -118,7 +118,7 @@
 	</div>
 	<div id="settings" style="display: none">
 		<h1>What is your name?</h1>
-		<input type="text" id="nameInput" name="name" placeholder="Your name.." autofocus/>
+		<input type="text" id="nameInput" name="name" placeholder="Your name.." autofocus />
 		<br /><br /><br />
 		<button id="saveSettingsButton">Play &#9658;</button>
 	</div>
@@ -174,20 +174,20 @@
 		const input = []
 		let time = performance.now()
 
-		const inputType = ('ontouchstart' in window) ? 'ontouchstart' : 'click'
+		const inputEventType = ('ontouchstart' in window) ? 'touchstart' : 'click'
+		document.addEventListener(inputEventType, () => input.push(true))
+		pauseButton.addEventListener(inputEventType, () => pauseGame())
+		playButton.addEventListener(inputEventType, () => playGame())
+		clickToPlay.addEventListener(inputEventType, () => playGame())
+		settingsButton.addEventListener(inputEventType, () => showSettings())
+		saveSettingsButton.addEventListener(inputEventType, () => saveSettings())
 		document.addEventListener('keyup', () => input.push(true))
 		nameInput.addEventListener('keyup', () => { if (event.keyCode === 13) { saveSettingsButton.click() } })
-		document.addEventListener(inputType, () => input.push(true))
-		pauseButton.addEventListener(inputType, () => pauseGame())
-		playButton.addEventListener(inputType, () => playGame())
-		clickToPlay.addEventListener(inputType, () => playGame())
-		settingsButton.addEventListener(inputType, () => showSettings())
-		saveSettingsButton.addEventListener(inputType, () => saveSettings())
+
 		requestAnimationFrame(gameLoop)
 
 		function start() {
 			loading.style.display = 'none';
-			console.log(game.stats.user.name)
 			if (!game.stats.user.name) {
 				settings.style.display = 'block';
 				container.style.display = 'none';
@@ -200,7 +200,7 @@
 			settings.style.display = 'none';
 			loading.style.display = 'none';
 			container.style.display = 'block';
-			while (input.length) { input.pop(); }
+			while (input.length) { input.pop(); }			
 			time = performance.now()
 			paused = false
 		}
