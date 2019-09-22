@@ -127,8 +127,7 @@
 		<div id="clickToPlay" style="display: none">
 		</div>
 		<div id="actions">
-			<span id="pauseButton" style="display: none">&#10074;&#10074;</span>
-			<span id="playButton" style="display: none">&#9658;</span>
+			<span id="pauseButton" style="display: none;">&nbsp; &#10074;&#10074; &nbsp;</span>			
 			<span>&nbsp;&nbsp;&nbsp;</span>
 			<span id="settingsButton">&#9881;</span>
 		</div>
@@ -157,7 +156,6 @@
 		const loading = document.getElementById('loading')
 		const settings = document.getElementById('settings')
 		const pauseButton = document.getElementById('pauseButton')
-		const playButton = document.getElementById('playButton')
 		const settingsButton = document.getElementById('settingsButton')
 		const saveSettingsButton = document.getElementById('saveSettingsButton')
 		const nameInput = document.getElementById('nameInput')
@@ -176,14 +174,13 @@
 
 		const inputEventType = ('ontouchstart' in window) ? 'touchstart' : 'click'
 		document.addEventListener(inputEventType, () => input.push(true))
-		pauseButton.addEventListener(inputEventType, () => pauseGame())
-		playButton.addEventListener(inputEventType, () => playGame())
+		pauseButton.addEventListener(inputEventType, () => pauseGame())		
 		clickToPlay.addEventListener(inputEventType, () => playGame())
 		settingsButton.addEventListener(inputEventType, () => showSettings())
 		saveSettingsButton.addEventListener(inputEventType, () => saveSettings())
 		document.addEventListener('keyup', () => input.push(true))
 		nameInput.addEventListener('keyup', () => { if (event.keyCode === 13) { saveSettingsButton.click() } })
-
+		document.addEventListener('visibilitychange', () => { if (document['hidden']) { pauseGame() } })
 		requestAnimationFrame(gameLoop)
 
 		function start() {
@@ -197,16 +194,16 @@
 		}
 
 		function playGame() {
-			settings.style.display = 'none';
-			loading.style.display = 'none';
+			settings.style.display = 'none';			
 			container.style.display = 'block';
-			while (input.length) { input.pop(); }			
+			while (input.length) { input.pop(); }
 			time = performance.now()
 			paused = false
 		}
-		function pauseGame() {
+		function pauseGame() {			
 			paused = true;
 			clickToPlay.style.display = 'inline';
+			game.sounds.pauseMusic()
 		}
 		function gameLoop() {
 			requestAnimationFrame(gameLoop)
@@ -222,8 +219,7 @@
 
 			view.render(game, ctx)
 
-			pauseButton.style.display = paused ? 'none' : 'inline';
-			playButton.style.display = !paused ? 'none' : 'inline';
+			pauseButton.style.display = game.gameOver || paused ? 'none' : 'inline';			
 			clickToPlay.style.display = !paused ? 'none' : 'inline';
 		}
 		function fullscreen() {
