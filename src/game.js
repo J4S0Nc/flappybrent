@@ -123,15 +123,18 @@ export default class Game {
             this.sounds.pauseMusic()
             return
         }
-        
+
         if (!this.started) {
             if (!flapping) return
             this.started = true
             this.gameOver = false
             this.startTime = performance.now()
-            this.flaps = 0            
+            this.flaps = 0
         }
-        this.sounds.playMusic()
+        if (this.started && !this.gameOver) {
+            this.sounds.playMusic()
+        }
+
         this.flappy.update(flapping)
         if (flapping) this.flaps++
 

@@ -92,6 +92,7 @@
 			border: 1px solid #f99;
 			color: #f99;
 		}
+
 		#actions {
 			position: absolute;
 			text-align: center;
@@ -117,8 +118,8 @@
 	</div>
 	<div id="settings" style="display: none">
 		<h1>What is your name?</h1>
-		<input type="text" id="name" name="name" placeholder="Your name.." />
-		<br/><br/><br/>
+		<input type="text" id="nameInput" name="name" placeholder="Your name.." autofocus/>
+		<br /><br /><br />
 		<button id="saveSettingsButton">Play &#9658;</button>
 	</div>
 
@@ -159,28 +160,41 @@
 		const playButton = document.getElementById('playButton')
 		const settingsButton = document.getElementById('settingsButton')
 		const saveSettingsButton = document.getElementById('saveSettingsButton')
+		const nameInput = document.getElementById('nameInput')
 		const clickToPlay = document.getElementById('clickToPlay')
 
-		const loader = new Loader(loading, container, playGame)
+		const loader = new Loader(loading, container, start)
 		const canvas = document.getElementById('viewport')
 		const ctx = canvas.getContext('2d', { alpha: false })
-		
+
 		const TICK = 1000 / 240 // 240 updates / second
-		let paused = false;
+		let paused = true;
 		window.game = new Game()
 		const view = new View()
 		const input = []
-		let time = performance.now()	
-		
-		const inputType = ('ontouchstart' in window) ? 'ontouchstart' : 'click'		
-		document.addEventListener('keyup', () => input.push(true))		
+		let time = performance.now()
+
+		const inputType = ('ontouchstart' in window) ? 'ontouchstart' : 'click'
+		document.addEventListener('keyup', () => input.push(true))
+		nameInput.addEventListener('keyup', () => { if (event.keyCode === 13) { saveSettingsButton.click() } })
 		document.addEventListener(inputType, () => input.push(true))
 		pauseButton.addEventListener(inputType, () => pauseGame())
 		playButton.addEventListener(inputType, () => playGame())
 		clickToPlay.addEventListener(inputType, () => playGame())
 		settingsButton.addEventListener(inputType, () => showSettings())
 		saveSettingsButton.addEventListener(inputType, () => saveSettings())
+		requestAnimationFrame(gameLoop)
 
+		function start() {
+			loading.style.display = 'none';
+			console.log(game.stats.user.name)
+			if (!game.stats.user.name) {
+				settings.style.display = 'block';
+				container.style.display = 'none';
+			} else {
+				playGame()
+			}
+		}
 
 		function playGame() {
 			settings.style.display = 'none';
@@ -189,8 +203,6 @@
 			while (input.length) { input.pop(); }
 			time = performance.now()
 			paused = false
-
-			requestAnimationFrame(gameLoop)
 		}
 		function pauseGame() {
 			paused = true;
@@ -201,7 +213,7 @@
 			const now = performance.now()
 			game.paused = paused;
 			while (time + TICK <= now) {
-				const flapping = input.shift()
+				const flapping = !paused && input.shift()
 				const finished = game.update(flapping)
 				if (finished && flapping && game.gameOver) game = new Game() //start new game
 
@@ -224,13 +236,14 @@
 		}
 		function showSettings() {
 			pauseGame()
-			document.getElementById("name").value = game.stats.user.name
+			document.getElementById("nameInput").value = game.stats.user.name
 			container.style.display = 'none';
 			settings.style.display = 'block';
 		}
 		function saveSettings() {
-			const name = document.getElementById("name").value
+			const name = document.getElementById("nameInput").value
 			game.stats.user.name = name
+			game.stats.saveStats()
 			settings.style.display = 'none';
 			container.style.display = 'block';
 			pauseGame()

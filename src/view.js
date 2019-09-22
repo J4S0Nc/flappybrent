@@ -78,7 +78,7 @@ export default class View {
             ctx.fillText('Breeeeent!', 30, 250);
         }
 
-        if (game.paused) {            
+        if (game.started && game.paused) {            
             ctx.font = '420px bold verdana'
             ctx.fillText('Paused!', 300, 350);
         }
